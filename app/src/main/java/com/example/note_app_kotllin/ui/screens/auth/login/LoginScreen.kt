@@ -38,6 +38,7 @@ import com.example.note_app_kotllin.R
 import com.example.note_app_kotllin.core.constants.AppDurations
 import com.example.note_app_kotllin.core.constants.BorderRadiuses
 import com.example.note_app_kotllin.core.constants.Paddings
+import com.example.note_app_kotllin.core.constants.Spaces
 import com.example.note_app_kotllin.core.navigation.Home
 import com.example.note_app_kotllin.core.navigation.Login
 import com.example.note_app_kotllin.core.navigation.Notes
@@ -100,7 +101,7 @@ fun LoginScreen(
                         focusManager.clearFocus()
                     })
                 }) {
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(Spaces.TopSpace))
 
             Text(
                 text = stringResource(R.string.welcome_back),
@@ -108,7 +109,7 @@ fun LoginScreen(
                 modifier = Modifier.padding(Paddings.Medium)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(Spaces.LargeMinus))
 
             Column(
                 modifier = Modifier
@@ -132,7 +133,8 @@ fun LoginScreen(
                     errorMessage = state.passwordError
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(Spaces.LargeMinus))
+
                 OutlinedButton(
                     modifier = Modifier
                         .fillMaxWidth().height(70.dp)
@@ -150,7 +152,7 @@ fun LoginScreen(
                   }
 
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(Spaces.LargeMinus))
 
                 RichText(
                     startText = stringResource(R.string.dont_have_account),

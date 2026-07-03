@@ -10,7 +10,6 @@ import timber.log.Timber
 class NoteApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
