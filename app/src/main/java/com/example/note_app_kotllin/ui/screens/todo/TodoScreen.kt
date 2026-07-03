@@ -20,17 +20,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.example.note_app_kotllin.R
 import com.example.note_app_kotllin.core.constants.Paddings
 import com.example.note_app_kotllin.core.constants.Spaces
+import com.example.note_app_kotllin.domain.models.Todo
+import com.example.note_app_kotllin.ui.components.EmptyStateBox
 import com.example.note_app_kotllin.ui.screens.todo.components.TodoCard
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -45,15 +47,10 @@ fun TodoScreen(
     val listState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
 
-    val displayedTodos = remember(state.todos, state.draftTodo) {
-        val draft = state.draftTodo
-        if (draft != null) listOf(draft) + state.todos else state.todos
-    }
-
-    LaunchedEffect(state.todos.size) {
-        if (state.todos.isNotEmpty()) {
-            listState.animateScrollToItem(0)
-        }
+    val todoList: List<Todo> = if (state.draftTodo != null) {
+        listOf(state.draftTodo!!) + state.todos
+    } else {
+        state.todos
     }
 
     DisposableEffect(Unit) {
@@ -80,25 +77,32 @@ fun TodoScreen(
                     detectTapGestures(onTap = { focusManager.clearFocus() })
                 }
         ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = parentPadding.calculateTopPadding()),
-                contentPadding = PaddingValues(Paddings.Medium),
-                verticalArrangement = Arrangement.spacedBy(Spaces.Medium)
-            ) {
-                itemsIndexed(displayedTodos, key = { _, item -> item.id.ifEmpty { "draft" } }) { _, item ->
-                    TodoCard(
-                        initialDescription = item.description,
-                        isCompleted = item.isCompleted,
-                        isFocused = state.focusedTodoId == item.id,
-                        onFocusGained = { viewModel.onFocusGained(item.id, item.description) },
-                        onTextChange = { viewModel.onTextChange(it) },
-                        onFocusLost = { viewModel.handleFocusLost(item.id, it, item.isCompleted) },
-                        onCheckedChange = { viewModel.updateTodoCompletion(item.id, item.description, it) },
-                        onLongClick = { viewModel.deleteTodo(item.id) }
-                    )
+            if (todoList.isEmpty()) {
+                EmptyStateBox(stringResource(R.string.empty_state))
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = parentPadding.calculateTopPadding()),
+                    contentPadding = PaddingValues(Paddings.Medium),
+                    verticalArrangement = Arrangement.spacedBy(Spaces.Medium)
+                ) {
+                    itemsIndexed(
+                        items = todoList,
+                        key = { _, todo -> todo.id.ifEmpty { "draft" } }
+                    ) { _, todo ->
+                        TodoCard(
+                            initialDescription = todo.description,
+                            isCompleted = todo.isCompleted,
+                            isFocused = state.focusedTodoId == todo.id,
+                            onFocusGained = { viewModel.onFocusGained(todo.id, todo.description) },
+                            onTextChange = { viewModel.onTextChange(it) },
+                            onFocusLost = { viewModel.handleFocusLost(todo.id, it, todo.isCompleted) },
+                            onCheckedChange = { viewModel.updateTodoCompletion(todo.id, todo.description, it) },
+                            onLongClick = { viewModel.deleteTodo(todo.id) }
+                        )
+                    }
                 }
             }
         }

@@ -72,7 +72,7 @@ fun RegisterScreen(
             snackBarHostState.showSnackbar(registerSuccessMessage)
             delay(AppDurations.MediumPlus)
             navController.navigate(Home) {
-                popUpTo(Register) {
+                popUpTo(0) {
                     inclusive = true
                 }
             }

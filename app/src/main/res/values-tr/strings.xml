@@ -39,7 +39,7 @@
     <string name="error_passwords_not_match">Şifreler uyuşmuyor</string>
 
     <!-- ===== Notes ===== -->
-    <string name="notes_empty_state">Henüz not yok. Eklemek için + butonuna basın.</string>
+    <string name="empty_state">Henüz bir şey yok. Eklemek için + butonuna basın.</string>
 
     <!-- ===== Note Detail ===== -->
     <string name="cd_delete">Notu sil</string>

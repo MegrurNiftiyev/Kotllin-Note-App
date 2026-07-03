@@ -66,7 +66,7 @@ fun NotesScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     if (state.notes.isEmpty()) {
-                        EmptyStateBox(stringResource(R.string.notes_empty_state))
+                        EmptyStateBox(stringResource(R.string.empty_state))
                     } else {
                         LazyColumn(
                             modifier = Modifier

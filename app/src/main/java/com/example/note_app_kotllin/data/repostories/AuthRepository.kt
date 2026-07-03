@@ -4,6 +4,8 @@ import com.example.note_app_kotllin.core.constants.CacheKeys
 import com.example.note_app_kotllin.core.exceptions.AuthException
 import com.example.note_app_kotllin.core.exceptions.NetworkException
 import com.example.note_app_kotllin.core.managers.EncryptedCacheManager
+import com.example.note_app_kotllin.data.datasoruces.local.NoteLocalDataSource
+import com.example.note_app_kotllin.data.datasoruces.local.TodoLocalDataSource
 import com.example.note_app_kotllin.data.datasoruces.local.UserLocalDataSource
 import com.example.note_app_kotllin.data.datasoruces.remote.datasources.AuthRemoteDataSource
 import com.example.note_app_kotllin.domain.models.User
@@ -16,7 +18,9 @@ import javax.inject.Singleton
 class AuthRepository @Inject constructor(
     private val remoteDataSource: AuthRemoteDataSource,
     private val encryptedCacheManager: EncryptedCacheManager,
-    private val localDataSource: UserLocalDataSource
+    private val localDataSource: UserLocalDataSource,
+    private val noteLocalDataSource: NoteLocalDataSource,
+    private val todoLocalDataSource: TodoLocalDataSource
 
 ) : IAuthRepository {
 
@@ -74,6 +78,8 @@ class AuthRepository @Inject constructor(
             remoteDataSource.logout(refreshToken)
             encryptedCacheManager.clearAllCache()
             localDataSource.clearUser()
+            noteLocalDataSource.deleteAllNotes()
+            todoLocalDataSource.deleteAllTodos()
             Result.success(Unit)
         } catch (e: AuthException) {
             Result.failure(e)
@@ -82,5 +88,3 @@ class AuthRepository @Inject constructor(
         }
     }
 }
-
-

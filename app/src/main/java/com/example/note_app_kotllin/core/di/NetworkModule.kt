@@ -1,12 +1,12 @@
 package com.example.note_app_kotllin.core.di
 
-import com.example.Todo_app_kotllin.data.datasoruces.remote.services.TodoApiService
 import com.example.note_app_kotllin.BuildConfig
 import com.example.note_app_kotllin.core.constants.ApiUrls
 import com.example.note_app_kotllin.core.interceptors.AuthInterceptor
 import com.example.note_app_kotllin.core.interceptors.TokenAuthenticator
 import com.example.note_app_kotllin.data.datasoruces.remote.services.AuthApiService
 import com.example.note_app_kotllin.data.datasoruces.remote.services.NoteApiService
+import com.example.note_app_kotllin.data.datasoruces.remote.services.TodoApiService
 import com.example.note_app_kotllin.data.datasoruces.remote.services.UserApiService
 import dagger.Module
 import dagger.Provides
@@ -40,7 +40,7 @@ object NetworkModule {
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
-            if (BuildConfig.DEBUG) {
+            level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
             } else {
                 HttpLoggingInterceptor.Level.NONE
@@ -57,9 +57,10 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor
 
     ): OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(authInterceptor)
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
-            // .authenticator(tokenAuthenticator)
+            .authenticator(tokenAuthenticator)
             .build()
     }
 

@@ -70,7 +70,7 @@ fun LoginScreen(
             snackBarHostState.showSnackbar(loginSuccessMessage)
             delay(AppDurations.MediumPlus)
             navController.navigate(Home) {
-                popUpTo(Login) {
+                popUpTo(0) {
                     inclusive = true
                 }
             }

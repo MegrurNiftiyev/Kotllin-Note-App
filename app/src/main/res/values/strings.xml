@@ -38,7 +38,7 @@
     <string name="error_passwords_not_match">Passwords do not match</string>
 
     <!-- ===== Notes ===== -->
-    <string name="notes_empty_state">No notes yet. Click the + button to add one.</string>
+    <string name="empty_state">No elements yet. Click the + button to add one.</string>
 
     <!-- ===== Note Detail ===== -->
     <string name="cd_delete">Delete note</string>

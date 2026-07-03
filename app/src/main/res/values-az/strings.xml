@@ -39,7 +39,8 @@
     <string name="error_passwords_not_match">Şifrələr uyğun gəlmir</string>
 
     <!-- ===== Notes ===== -->
-    <string name="notes_empty_state">Hələlik qeyd yoxdur. Əlavə etmək üçün + düyməsinə basın.</string>
+    <string name="empty_state">Hələlik heç bir şey yoxdur. Əlavə etmək üçün + düyməsinə basın.</string>
+
 
     <!-- ===== Note Detail ===== -->
     <string name="cd_delete">Qeydi sil</string>
