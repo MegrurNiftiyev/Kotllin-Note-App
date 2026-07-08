@@ -32,3 +32,6 @@ data class NoteDetail(
 
 @Serializable
 object Todos
+
+@Serializable
+object AiChat

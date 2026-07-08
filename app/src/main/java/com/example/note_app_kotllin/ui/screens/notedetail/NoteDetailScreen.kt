@@ -103,12 +103,7 @@ fun NoteDetailScreen(
                         contentDescription = stringResource(id = R.string.cd_delete)
                     )
                 }
-                IconButton(onClick = { }) {
-                    Icon(
-                        Icons.Default.Share,
-                        contentDescription = stringResource(id = R.string.cd_share)
-                    )
-                }
+
             })
         }) { innerPadding ->
         Column(
