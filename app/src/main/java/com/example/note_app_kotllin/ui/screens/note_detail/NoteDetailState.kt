@@ -1,4 +1,4 @@
-package com.example.note_app_kotllin.ui.screens.notedetail
+package com.example.note_app_kotllin.ui.screens.note_detail
 
 data class NoteDetailState(
     val isSynced: Boolean = true,

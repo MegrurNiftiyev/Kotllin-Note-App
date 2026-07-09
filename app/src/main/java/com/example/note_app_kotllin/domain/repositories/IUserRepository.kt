@@ -8,5 +8,4 @@ interface IUserRepository {
     suspend fun getUser(): User?
     suspend fun  synUser(): Result<Unit>
 
-
 }

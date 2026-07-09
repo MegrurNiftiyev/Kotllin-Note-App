@@ -11,7 +11,7 @@ import com.example.note_app_kotllin.ui.aichat.AiChatScreen
 import com.example.note_app_kotllin.ui.screens.auth.login.LoginScreen
 import com.example.note_app_kotllin.ui.screens.auth.register.RegisterScreen
 import com.example.note_app_kotllin.ui.screens.home.HomeScreen
-import com.example.note_app_kotllin.ui.screens.notedetail.NoteDetailScreen
+import com.example.note_app_kotllin.ui.screens.note_detail.NoteDetailScreen
 import com.example.note_app_kotllin.ui.screens.notes.NotesScreen
 import com.example.note_app_kotllin.ui.screens.settings.SettingsScreen
 import com.example.note_app_kotllin.ui.screens.splash.SplashScreen

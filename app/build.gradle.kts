@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
-
+    alias(libs.plugins.android.secrets)
 }
 
 android {
