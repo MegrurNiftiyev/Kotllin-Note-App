@@ -2,8 +2,7 @@ package com.example.note_app_kotllin.core.constants
 
 import androidx.compose.ui.unit.dp
 
-object Spaces {
-
+object IconSizes {
     val ExtraMini = 4.dp
     val Mini = 6.dp
     val Tiny = 8.dp
@@ -14,11 +13,9 @@ object Spaces {
     val MediumPlus = 18.dp
     val LargeMinus = 20.dp
     val Large = 22.dp
-    val LargePlus = 24.dp
+    val LargePlus = 28.dp
     val ExtraLarge = 26.dp
     val ExtraLargePlus = 28.dp
     val Huge = 30.dp
     val ExtraHuge = 32.dp
-    val TopSpace=70.dp
-
 }

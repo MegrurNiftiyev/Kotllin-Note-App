@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpenAiRequest(
-    val model: String = "gpt-5.4-mini",
+    val model: String ,
     val instructions: String,
     val input: List<InputItem>,
     val temperature: Double = 1.0,

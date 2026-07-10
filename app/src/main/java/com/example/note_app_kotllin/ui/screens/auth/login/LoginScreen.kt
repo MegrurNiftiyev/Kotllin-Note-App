@@ -69,7 +69,7 @@ fun LoginScreen(
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
             snackBarHostState.showSnackbar(loginSuccessMessage)
-            delay(AppDurations.MediumPlus)
+            delay(AppDurations.MediumMinus)
             navController.navigate(Home) {
                 popUpTo(0) {
                     inclusive = true

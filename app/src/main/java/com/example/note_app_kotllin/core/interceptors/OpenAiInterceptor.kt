@@ -17,3 +17,4 @@ class OpenAiInterceptor @Inject constructor() : Interceptor {
         return chain.proceed(authenticatedRequest)
     }
 }
+

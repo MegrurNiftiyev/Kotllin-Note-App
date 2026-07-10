@@ -1,13 +1,16 @@
 // core/navigation/NavGraph.kt
 package com.example.note_app_kotllin.core.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.note_app_kotllin.ui.aichat.AiChatScreen
+import com.example.note_app_kotllin.ui.screens.aichat.AiChatScreen
 import com.example.note_app_kotllin.ui.screens.auth.login.LoginScreen
 import com.example.note_app_kotllin.ui.screens.auth.register.RegisterScreen
 import com.example.note_app_kotllin.ui.screens.home.HomeScreen
@@ -22,7 +25,33 @@ import com.example.note_app_kotllin.ui.screens.todo.TodoScreen
 fun NoteAppNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
-    NavHost(navController = navController, startDestination = Splash) {
+    NavHost(navController = navController, startDestination = Splash,
+
+            enterTransition = {
+        slideInHorizontally(
+            initialOffsetX = { fullWidth -> fullWidth },
+            animationSpec = tween(300)
+        )
+    },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> -fullWidth },
+                animationSpec = tween(300)
+            )
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> -fullWidth },
+                animationSpec = tween(300)
+            )
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(300)
+            )
+        }
+    ) {
         composable <Splash>{ SplashScreen(navController) }
         composable<Home> { HomeScreen(navController) }
         composable<Register> { RegisterScreen(navController) }

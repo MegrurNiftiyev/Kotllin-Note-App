@@ -1,10 +1,12 @@
 package com.example.note_app_kotllin.core.di
 
+import com.example.note_app_kotllin.data.repostories.AiRepository
 import com.example.note_app_kotllin.data.repostories.AuthRepository
 import com.example.note_app_kotllin.data.repostories.NotesRepository
 import com.example.note_app_kotllin.data.repostories.SettingsRepository
 import com.example.note_app_kotllin.data.repostories.TodoRepository
 import com.example.note_app_kotllin.data.repostories.UserRepository
+import com.example.note_app_kotllin.domain.repositories.IAiRepository
 import com.example.note_app_kotllin.domain.repositories.IAuthRepository
 import com.example.note_app_kotllin.domain.repositories.INotesRepository
 import com.example.note_app_kotllin.domain.repositories.ISettingsRepository
@@ -41,10 +43,13 @@ abstract class RepositoryModule {
     ): INotesRepository
 
     @Binds
-    abstract  fun bindTodRepository(
+    abstract  fun bindTodoRepository(
         impl: TodoRepository
     ): ITodoRepository
 
-
+    @Binds
+    abstract  fun bindAiRepository(
+        impl: AiRepository
+    ): IAiRepository
 
 }

@@ -38,8 +38,23 @@
     <string name="error_empty_confirm_password">Lütfen şifrenizi tekrar girin</string>
     <string name="error_passwords_not_match">Şifreler uyuşmuyor</string>
 
+    <!-- ===== AI Chat ===== -->
+    <string name="ai_chat_title">AI Sohbet</string>
+    <string name="ai_chat_placeholder">Mesaj yazın...</string>
+    <string name="ai_chat_stop">Durdur</string>
+    <string name="ai_chat_send">Gönder</string>
+    <string name="empty_ai_state">Yapay zekaya ilk mesajınızı gönderin</string>
+    <string name="ai_chat_typing">Yazıyor...</string>
+
+    <!-- ===== AI Chat Errors ===== -->
+    <string name="error_ai_validation">Yapay zeka doğrulama hatası. Lütfen isteğinizi kontrol edin.</string>
+    <string name="error_ai_unauthorized">Yapay zeka hizmetine erişim izni yok. API anahtarınızı kontrol edin.</string>
+    <string name="error_ai_rate_limited">Yapay zeka sınırına ulaşıldı. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_ai_server_error">Yapay zeka sunucu hatası. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_ai_empty_response">Yapay zeka boş bir yanıt döndürdü.</string>
+
     <!-- ===== Notes ===== -->
-    <string name="empty_state">Henüz bir şey yok. Eklemek için + butonuna basın.</string>
+    <string name="empty_state">Henüz bir şey yok.</string>
 
     <!-- ===== Note Detail ===== -->
     <string name="cd_delete">Notu sil</string>
@@ -51,7 +66,7 @@
     <string name="settings_title">Ayarlar</string>
     <string name="settings_language">Dil</string>
     <string name="settings_dark_mode">Koyu Mod</string>
-    <string name="settings_logout">Çıkış yap</string>
+    <string name="settings_logout">Çıxış yap</string>
 
 
     <!-- ===== Language Sheet ===== -->
