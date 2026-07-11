@@ -47,11 +47,9 @@ fun AiChatScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state.messages.size, state.isLoading) {
-        val lastIndex = state.messages.size - if (state.isLoading) 0 else 1
-        if (lastIndex >= 0) {
-            val targetIndex = state.messages.size + if (state.isLoading) 1 else 0 - 1
-            listState.animateScrollToItem(targetIndex.coerceAtLeast(0))
+    LaunchedEffect(state.messages.size) {
+        if (state.messages.isNotEmpty()) {
+            listState.animateScrollToItem(state.messages.size - 1)
         }
     }
 

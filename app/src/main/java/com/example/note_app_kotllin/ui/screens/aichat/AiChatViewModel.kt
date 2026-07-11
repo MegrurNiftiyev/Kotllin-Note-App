@@ -68,7 +68,6 @@ class AiChatViewModel @Inject constructor(
                 messages = it.messages + userMessage,
                 inputText = "",
                 isLoading = true,
-                error = null
             )
         }
 
@@ -94,7 +93,6 @@ class AiChatViewModel @Inject constructor(
                     s.copy(
                         messages = s.messages + errorMessage,
                         isLoading = false,
-                        error = errorText
                     )
                 }
             }

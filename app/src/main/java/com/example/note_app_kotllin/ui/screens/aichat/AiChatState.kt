@@ -6,5 +6,4 @@ data class AiChatState(
     val isLoading: Boolean = false,
     val inputText: String = "",
     val messages: List<Message> = emptyList(),
-    val error: String? = null
 )
