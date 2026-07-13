@@ -128,7 +128,7 @@ fun SettingsScreen(
                 onClick = {
                     viewModel.logout()
                     navController.navigate(Register) {
-                        popUpTo(0) {
+                        popUpTo(navController.graph.id) {
                             inclusive = true
                         }
                     }

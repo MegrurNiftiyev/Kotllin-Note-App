@@ -39,6 +39,9 @@ class AiChatViewModel @Inject constructor(
     private val _state = MutableStateFlow(AiChatState())
     val state = _state.asStateFlow()
 
+
+
+
     private val notes = notesRepository.getAllNotes()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -99,6 +102,10 @@ class AiChatViewModel @Inject constructor(
         }
     }
 
+    fun onAnimationCompleted(id: String) {
+        _state.update { it.copy(messageAnimationCompletedIds = it.messageAnimationCompletedIds + id) }
+    }
+
     private fun Throwable.toUiText(): UiText = when (this) {
         is AiException.ValidationError -> UiText.StringResource(R.string.error_ai_validation)
         is AiException.Unauthorized -> UiText.StringResource(R.string.error_ai_unauthorized)
@@ -110,38 +117,66 @@ class AiChatViewModel @Inject constructor(
     }
 
     private suspend fun executeTasks(tasks: List<Task>) {
-        tasks.forEach { task ->
+        for (task in tasks) {
             try {
                 when (task.purpose) {
-                    Purpose.CreateNote -> {
-                        val note = task.note ?: return@forEach
-                        notesRepository.createNote(title = note.title, content = note.content)
-                    }
-                    Purpose.CreateTodo -> {
-                        val todo = task.todo ?: return@forEach
-                        todoRepository.createTodo(description = todo.description, isCompleted = false)
-                    }
-                    Purpose.UpdateNote -> {
-                        val note = task.note ?: return@forEach
-                        val id = task.noteId ?: return@forEach
-                        notesRepository.updateNote(id = id, title = note.title, content = note.content)
-                    }
-                    Purpose.UpdateTodo -> {
-                        val todo = task.todo ?: return@forEach
-                        val id = task.todoId ?: return@forEach
-                        todoRepository.updateTodo(id = id, description = todo.description, isCompleted = todo.isCompleted)
-                    }
-                    Purpose.DeleteNote -> {
-                        val id = task.noteId ?: return@forEach
-                        notesRepository.deleteNote(id)
-                    }
-                    Purpose.DeleteTodo -> {
-                        val id = task.todoId ?: return@forEach
-                        todoRepository.deleteTodo(id)
-                    }
+                    Purpose.CreateNote -> createNote(task)
+                    Purpose.CreateTodo -> createTodo(task)
+                    Purpose.UpdateNote -> updateNote(task)
+                    Purpose.UpdateTodo -> updateTodo(task)
+                    Purpose.DeleteNote -> deleteNote(task)
+                    Purpose.DeleteTodo -> deleteTodo(task)
                 }
             } catch (e: Exception) {
             }
+        }
+    }
+
+    private suspend fun createNote(task: Task) {
+        val note = task.note
+        if (note != null) {
+            notesRepository.createNote(title = note.title, content = note.content)
+        }
+    }
+
+    private suspend fun createTodo(task: Task) {
+        val todo = task.todo
+        if (todo != null) {
+            todoRepository.createTodo(description = todo.description, isCompleted = false)
+        }
+    }
+
+    private suspend fun updateNote(task: Task) {
+        val note = task.note
+        val id = task.noteId
+        if (note != null && id != null) {
+            notesRepository.updateNote(id = id, title = note.title, content = note.content)
+        }
+    }
+
+    private suspend fun updateTodo(task: Task) {
+        val todo = task.todo
+        val id = task.todoId
+        if (todo != null && id != null) {
+            todoRepository.updateTodo(
+                id = id,
+                description = todo.description,
+                isCompleted = todo.isCompleted
+            )
+        }
+    }
+
+    private suspend fun deleteNote(task: Task) {
+        val id = task.noteId
+        if (id != null) {
+            notesRepository.deleteNote(id)
+        }
+    }
+
+    private suspend fun deleteTodo(task: Task) {
+        val id = task.todoId
+        if (id != null) {
+            todoRepository.deleteTodo(id)
         }
     }
 }

@@ -2,14 +2,18 @@ package com.example.note_app_kotllin.ui.screens.todo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.note_app_kotllin.core.managers.AppNetworkManager
 import com.example.note_app_kotllin.data.repostories.TodoRepository
 import com.example.note_app_kotllin.domain.models.Todo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val todoRepository: TodoRepository
+    private val todoRepository: TodoRepository,
+    private val networkManager: AppNetworkManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TodoState())
@@ -26,8 +31,17 @@ class TodoViewModel @Inject constructor(
     init {
         listenLocalTodos()
         syncTodos()
+        listenConnectivity()
     }
 
+    private fun listenConnectivity() {
+        viewModelScope.launch(IO) {
+            networkManager.isConnected
+                .drop(1)
+                .filter { it }
+                .collect { syncTodos() }
+        }
+    }
     private fun listenLocalTodos() {
         viewModelScope.launch(IO) {
             todoRepository.getAllTodos().collect { todos ->
@@ -68,6 +82,12 @@ class TodoViewModel @Inject constructor(
     }
 
     fun handleFocusLost(id: String, finalText: String, isCompleted: Boolean) {
+        val currentTodo = _state.value.todos.find { it.id == id }
+
+        if (id.isNotEmpty() && currentTodo != null && currentTodo.description == finalText.trim()) {
+            _state.update { it.copy(focusedTodoId = null, focusedText = "") }
+            return
+        }
         saveOrDeleteTodo(id, finalText, isCompleted)
         _state.update { it.copy(focusedTodoId = null, focusedText = "") }
     }
@@ -75,7 +95,13 @@ class TodoViewModel @Inject constructor(
     fun handleScreenExit() {
         val current = _state.value
         val id = current.focusedTodoId ?: return
+        val currentTodo = current.todos.find { it.id == id }
         val isCompleted = current.todos.find { it.id == id }?.isCompleted ?: false
+
+        if (id.isNotEmpty() && currentTodo != null && currentTodo.description == current.focusedText.trim()) {
+            _state.update { it.copy(focusedTodoId = null, focusedText = "") }
+            return
+        }
 
         saveOrDeleteTodo(id, current.focusedText, isCompleted)
         _state.update { it.copy(focusedTodoId = null, focusedText = "") }
@@ -108,12 +134,14 @@ class TodoViewModel @Inject constructor(
         }
     }
 
+    private val updateJobs = mutableMapOf<String, Job>()
+
     fun updateTodoCompletion(id: String, description: String, isCompleted: Boolean) {
-        viewModelScope.launch {
+        updateJobs[id]?.cancel()
+        updateJobs[id] = viewModelScope.launch {
             todoRepository.updateTodo(id, description, isCompleted)
         }
     }
-
     fun deleteTodo(id: String) {
         if (_state.value.focusedTodoId == id) {
             _state.update { it.copy(focusedTodoId = null, focusedText = "") }

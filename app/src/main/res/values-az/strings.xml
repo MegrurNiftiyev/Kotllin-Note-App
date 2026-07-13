@@ -44,7 +44,7 @@
     <string name="ai_chat_stop">Dayandır</string>
     <string name="ai_chat_send">Göndər</string>
     <string name="empty_ai_state">Süni intellektə ilk mesajınızı göndərin</string>
-    <string name="ai_chat_typing">Yazır...</string>
+    <string name="ai_chat_typing">Yazır</string>
 
     <!-- ===== AI Chat Errors ===== -->
     <string name="error_ai_validation">Süni intellekt doğrulama xətası. Zəhmət olmasa sorğunu yoxlayın.</string>

@@ -44,7 +44,7 @@
     <string name="ai_chat_stop">Durdur</string>
     <string name="ai_chat_send">Gönder</string>
     <string name="empty_ai_state">Yapay zekaya ilk mesajınızı gönderin</string>
-    <string name="ai_chat_typing">Yazıyor...</string>
+    <string name="ai_chat_typing">Yazıyor</string>
 
     <!-- ===== AI Chat Errors ===== -->
     <string name="error_ai_validation">Yapay zeka doğrulama hatası. Lütfen isteğinizi kontrol edin.</string>

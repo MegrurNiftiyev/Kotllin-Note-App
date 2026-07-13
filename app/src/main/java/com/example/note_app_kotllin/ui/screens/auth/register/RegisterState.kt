@@ -10,4 +10,5 @@ data class RegisterState (
     val emailError: UiText? = null,
     val passwordError: UiText? = null,
     val confirmPasswordError: UiText? = null,
+
 )

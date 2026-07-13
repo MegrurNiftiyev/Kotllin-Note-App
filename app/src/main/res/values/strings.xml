@@ -43,7 +43,7 @@
     <string name="ai_chat_stop">Stop</string>
     <string name="ai_chat_send">Send</string>
     <string name="empty_ai_state">Send your first message to AI</string>
-    <string name="ai_chat_typing">Typing...</string>
+    <string name="ai_chat_typing">Typing</string>
 
     <!-- ===== AI Chat Errors ===== -->
     <string name="error_ai_validation">AI validation error. Please check your request.</string>

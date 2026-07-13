@@ -47,6 +47,7 @@ import com.example.note_app_kotllin.core.constants.BorderRadiuses
 import com.example.note_app_kotllin.core.constants.IconSizes
 import com.example.note_app_kotllin.core.constants.Paddings
 import com.example.note_app_kotllin.core.navigation.AiChat
+import com.example.note_app_kotllin.core.navigation.Home
 import com.example.note_app_kotllin.core.navigation.Notes
 import com.example.note_app_kotllin.core.navigation.Settings
 import com.example.note_app_kotllin.core.navigation.Todos
@@ -70,7 +71,16 @@ fun HomeScreen(
     Scaffold(containerColor = Color.Transparent, topBar = {
         Column {
             TopAppBar(title = { Text(stringResource(R.string.app_name)) }, actions = {
-                IconButton(onClick = { navController.navigate(AiChat) }) {
+                IconButton(onClick = {
+                    navController.navigate(AiChat) {
+                        popUpTo(Home) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+
+                }) {
                     Icon(
                         painter = painterResource(R.drawable.ai),
                         contentDescription = stringResource(id = R.string.settings_title),
@@ -148,39 +158,39 @@ fun HomeScreen(
                             )
                         ) { width -> width } + fadeIn(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         )) togetherWith (slideOutHorizontally(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         ) { width -> -width } + fadeOut(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         ))
                     } else {
                         (slideInHorizontally(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         ) { width -> -width } + fadeIn(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         )) togetherWith (slideOutHorizontally(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         ) { width -> width } + fadeOut(
                             animationSpec = tween(
-                                                                AppDurations.ExtraShort.toInt()
+                                AppDurations.ExtraShort.toInt()
 
                             )
                         ))

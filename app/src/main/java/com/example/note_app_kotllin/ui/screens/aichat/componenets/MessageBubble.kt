@@ -26,16 +26,21 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun MessageBubble(
-    modifier: Modifier = Modifier,
-    text: String,
+    text: String, modifier: Modifier = Modifier,
+    id: String,
     tasks: List<Task> = emptyList(),
     createdAt: Long,
-    type: MessageType
-) {
+    type: MessageType,
+    isAnimationCompleted: Boolean = false,
+    onAnimationCompleted: (String) -> Unit,
+
+    ) {
     val isUser = type == MessageType.User
 
     Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
     ) {
         Column(
@@ -60,10 +65,17 @@ fun MessageBubble(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                         } else {
-                            TypewriterText(
-                                fullText = text,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+
+                            if (isAnimationCompleted) {
+                                Text(text = text, color = MaterialTheme.colorScheme.onSurface)
+                            } else {
+                                TypewriterText(
+                                    fullText = text,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    onDone = { onAnimationCompleted(id) }
+                                )
+                            }
+
                         }
                     }
                     if (tasks.isNotEmpty()) {
@@ -75,7 +87,11 @@ fun MessageBubble(
             Text(
                 text = createdAt.toTimeLabel(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = Paddings.ExtraMini, start = Paddings.Mini, end = Paddings.Mini)
+                modifier = Modifier.padding(
+                    top = Paddings.ExtraMini,
+                    start = Paddings.Mini,
+                    end = Paddings.Mini
+                )
             )
         }
     }
@@ -85,7 +101,8 @@ fun MessageBubble(
 private fun TypewriterText(
     fullText: String,
     color: Color,
-    charDelayMillis: Long = 12L
+    charDelayMillis: Long = 12L,
+    onDone: () -> Unit
 ) {
     var visibleCharCount by remember(fullText) { mutableStateOf(0) }
 
@@ -95,6 +112,7 @@ private fun TypewriterText(
             visibleCharCount = index + 1
             delay(charDelayMillis)
         }
+        onDone()
     }
 
     Text(
@@ -105,9 +123,12 @@ private fun TypewriterText(
 
 @Composable
 private fun TaskCountChips(tasks: List<Task>) {
-    val createdCount = tasks.count { it.purpose == Purpose.CreateNote || it.purpose == Purpose.CreateTodo }
-    val updatedCount = tasks.count { it.purpose == Purpose.UpdateNote || it.purpose == Purpose.UpdateTodo }
-    val deletedCount = tasks.count { it.purpose == Purpose.DeleteNote || it.purpose == Purpose.DeleteTodo }
+    val createdCount =
+        tasks.count { it.purpose == Purpose.CreateNote || it.purpose == Purpose.CreateTodo }
+    val updatedCount =
+        tasks.count { it.purpose == Purpose.UpdateNote || it.purpose == Purpose.UpdateTodo }
+    val deletedCount =
+        tasks.count { it.purpose == Purpose.DeleteNote || it.purpose == Purpose.DeleteTodo }
 
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         if (createdCount > 0) CountChip("+$createdCount", MaterialTheme.colorScheme.primary)
@@ -119,7 +140,9 @@ private fun TaskCountChips(tasks: List<Task>) {
 @Composable
 private fun CountChip(text: String, color: Color) {
     Surface(shape = RoundedCornerShape(8.dp), color = color.copy(alpha = 0.14f)) {
-        Text(text, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal =Paddings.ExtraSmall, vertical = Paddings.Mini))
+        Text(
+            text, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = Paddings.ExtraSmall, vertical = Paddings.Mini)
+        )
     }
 }

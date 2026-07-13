@@ -1,10 +1,13 @@
 package com.example.note_app_kotllin.ui.screens.todo
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -60,6 +63,7 @@ fun TodoScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.ime,
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -69,16 +73,15 @@ fun TodoScreen(
                 Icon(
                     painterResource(R.drawable.edit),
                     contentDescription = null,
-                    modifier = Modifier.size(
-                        IconSizes.LargePlus
-                    )
+                    modifier = Modifier.size(IconSizes.LargePlus)
                 )
             }
-        }) { innerScaffoldPadding ->
+        }) { innerPadding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding())
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { focusManager.clearFocus() })
                 }) {
@@ -86,9 +89,7 @@ fun TodoScreen(
                 EmptyStateBox(
                     stringResource(R.string.empty_state),
                     painterResource(R.drawable.edit),
-                    modifier = Modifier.align(
-                        Alignment.Center
-                    )
+                    modifier = Modifier.align(Alignment.Center)
                 )
             } else {
                 LazyColumn(
@@ -96,12 +97,11 @@ fun TodoScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = parentPadding.calculateTopPadding()),
-
                     contentPadding = PaddingValues(
                         start = Paddings.Medium,
                         end = Paddings.Medium,
                         top = Paddings.Medium,
-                        bottom = Paddings.Medium + parentPadding.calculateBottomPadding() + Spaces.Medium
+                        bottom = parentPadding.calculateBottomPadding() + Spaces.Medium
                     ),
                     verticalArrangement = Arrangement.spacedBy(Spaces.Medium)
                 ) {
@@ -114,16 +114,8 @@ fun TodoScreen(
                             isFocused = state.focusedTodoId == todo.id,
                             onFocusGained = { viewModel.onFocusGained(todo.id, todo.description) },
                             onTextChange = { viewModel.onTextChange(it) },
-                            onFocusLost = {
-                                viewModel.handleFocusLost(
-                                    todo.id, it, todo.isCompleted
-                                )
-                            },
-                            onCheckedChange = {
-                                viewModel.updateTodoCompletion(
-                                    todo.id, todo.description, it
-                                )
-                            },
+                            onFocusLost = { viewModel.handleFocusLost(todo.id, it, todo.isCompleted) },
+                            onCheckedChange = { viewModel.updateTodoCompletion(todo.id, todo.description, it) },
                             onLongClick = { viewModel.deleteTodo(todo.id) })
                     }
                 }

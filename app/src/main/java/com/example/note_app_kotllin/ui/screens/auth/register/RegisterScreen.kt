@@ -45,6 +45,7 @@ import com.example.note_app_kotllin.core.navigation.Register
 import com.example.note_app_kotllin.ui.screens.auth.components.CustomTextField
 import com.example.note_app_kotllin.ui.screens.auth.components.RichText
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Preview
 @Composable
@@ -70,7 +71,7 @@ fun RegisterScreen(
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
             snackBarHostState.showSnackbar(registerSuccessMessage)
-            delay(AppDurations.MediumMinus)
+            delay(AppDurations.ShortPlus.milliseconds)
             navController.navigate(Home) {
                 popUpTo(0) {
                     inclusive = true
