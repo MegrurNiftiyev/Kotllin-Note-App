@@ -27,7 +27,7 @@ class AiInputManager @Inject constructor() {
     }
 
     private fun buildContextBlock(notes: List<Note>, todos: List<Todo>): String = buildString {
-        appendLine("Mövcud qeyd və tapşırıqlar:")
+        appendLine("All Notes And Todos:")
         notes.forEach { appendLine(it.toAiFormat()) }
         todos.forEach { appendLine(it.toAiFormat()) }
     }

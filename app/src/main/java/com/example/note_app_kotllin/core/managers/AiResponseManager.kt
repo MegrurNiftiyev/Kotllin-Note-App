@@ -14,6 +14,13 @@ import javax.inject.Singleton
 
 @Singleton
 class AiResponseManager @Inject constructor() {
+    companion object {
+        private const val DEFAULT_OUT_OF_SCOPE_MESSAGE =
+            "This isn't related to your notes or tasks, so I can't help with that here."
+        private const val DEFAULT_CLARIFY_MESSAGE =
+            "Could you clarify which note or task you mean?"
+    }
+
     val TASK_PREFIXES = setOf(
         "CREATENOTE", "CREATETODO", "UPDATENOTE", "UPDATETODO", "DELETENOTE", "DELETETODO"
     )
@@ -52,8 +59,14 @@ class AiResponseManager @Inject constructor() {
                 val prefix = line.substringBefore("|")
                 when {
                     prefix in TASK_PREFIXES -> line.toTaskOrNull()?.let { tasks.add(it) }
-                    prefix == "OUTOFSCOPE" -> messageLines.add(line.substringAfter("|").trim())
-                    prefix == "CLARIFY" -> messageLines.add(line.substringAfter("|").trim())
+                    prefix == "OUTOFSCOPE" -> {
+                        val reason = line.substringAfter("|").trim()
+                        messageLines.add(reason.ifBlank { DEFAULT_OUT_OF_SCOPE_MESSAGE })
+                    }
+                    prefix == "CLARIFY" -> {
+                        val question = line.substringAfter("|").trim()
+                        messageLines.add(question.ifBlank { DEFAULT_CLARIFY_MESSAGE })
+                    }
                     else -> messageLines.add(line)
                 }
             }
