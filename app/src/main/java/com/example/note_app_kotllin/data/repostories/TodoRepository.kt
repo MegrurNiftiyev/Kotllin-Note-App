@@ -25,87 +25,11 @@ class TodoRepository @Inject constructor(
             .map { entities -> entities.map { it.toDomainTodo() } }
     }
 
-    override suspend fun syncTodos(): Result<Unit> {
-        return try {
-            val locallyDeletedTodos = todoLocalDataSource.getLocallyDeletedTodos()
-            locallyDeletedTodos.forEach { localTodo ->
-                try {
-                    val isNewTodo = localTodo.id.isLocal()
-
-                    if (isNewTodo) {
-                        todoLocalDataSource.deleteTodoById(localTodo.id)
-                    } else {
-                        todoRemoteDataSource.deleteTodoById(localTodo.id)
-                        todoLocalDataSource.deleteTodoById(localTodo.id)
-                    }
-                } catch (e: Exception) {
-
-                }
-            }
-
-            val unsyncedTodos = todoLocalDataSource.getAllTodos().first().filter { !it.isSynced }
-            unsyncedTodos.forEach { localTodo ->
-                try {
-                    val isNewTodo = localTodo.id.isLocal()
-
-                    if (isNewTodo) {
-                        val response = todoRemoteDataSource.createTodo(localTodo.description, localTodo.isCompleted)
-                        val serverTodo = response.data.todo
-                        todoLocalDataSource.deleteTodoById(localTodo.id)
-                        todoLocalDataSource.insertTodo(serverTodo.toEntityTodo(isSynced = true).copy(createdAt = localTodo.createdAt))
-                    } else {
-                        val response = todoRemoteDataSource.updateTodo(localTodo.id, localTodo.description, localTodo.isCompleted)
-                        val serverTodo = response.data.todo
-                        todoLocalDataSource.insertTodo(serverTodo.toEntityTodo(isSynced = true).copy(createdAt = localTodo.createdAt))
-                    }
-                } catch (e: Exception) {
-
-                }
-            }
-
-            val remoteResponse = todoRemoteDataSource.getAllTodos()
-
-            val entities = remoteResponse.data.todos.map { remoteTodo ->
-                val localExisting = todoLocalDataSource.getTodoById(remoteTodo.id)
-                remoteTodo.toEntityTodo(isSynced = true).copy(
-                    createdAt = localExisting?.createdAt ?: System.currentTimeMillis()
-                )
-            }
-            todoLocalDataSource.insertTodos(entities)
-
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun getTodoById(id: String): Result<Todo> {
-        return try {
-            val response = todoRemoteDataSource.getTodoById(id)
-            val todoDto = response.data.todo
-            val localExisting = todoLocalDataSource.getTodoById(id)
-
-            todoLocalDataSource.insertTodo(
-                todoDto.toEntityTodo(isSynced = true).copy(
-                    createdAt = localExisting?.createdAt ?: System.currentTimeMillis()
-                )
-            )
-            Result.success(todoDto.toDomainTodo())
-        } catch (e: Exception) {
-            val localTodo = todoLocalDataSource.getTodoById(id)
-            if (localTodo != null) {
-                Result.success(localTodo.toDomainTodo())
-            } else {
-                Result.failure(e)
-            }
-        }
-    }
-
-    override suspend fun createTodo(description: String, isCompleted: Boolean): Result<Todo> {
+    override suspend fun createTodo(description: String, isCompleted: Boolean): Todo {
         val localId = UUID.randomUUID().toString().addLocalBanner()
         val currentTime = System.currentTimeMillis()
 
-        val initialLocalEntity = TodoEntity(
+        val entity = TodoEntity(
             id = localId,
             description = description,
             isCompleted = isCompleted,
@@ -114,71 +38,82 @@ class TodoRepository @Inject constructor(
             isSynced = false,
             isDeleted = false
         )
-        todoLocalDataSource.insertTodo(initialLocalEntity)
-
-        return try {
-            val response = todoRemoteDataSource.createTodo(description, isCompleted)
-            val todoDto = response.data.todo
-
-            todoLocalDataSource.deleteTodoById(localId)
-            todoLocalDataSource.insertTodo(todoDto.toEntityTodo(isSynced = true).copy(createdAt = currentTime))
-
-            Result.success(todoDto.toDomainTodo())
-        } catch (e: Exception) {
-            Result.success(initialLocalEntity.toDomainTodo())
-        }
+        todoLocalDataSource.insertTodo(entity)
+        return entity.toDomainTodo()
     }
 
-    override suspend fun updateTodo(id: String, description: String, isCompleted: Boolean): Result<Todo> {
-        val currentTime = System.currentTimeMillis()
-
-        val existingTodo = todoLocalDataSource.getTodoById(id)
-        val originalCreatedAt = existingTodo?.createdAt ?: currentTime
-
-        val updatedLocalEntity = TodoEntity(
-            id = id,
-            description = description,
-            isCompleted = isCompleted,
-            createdAt = originalCreatedAt,
-            updatedAt = currentTime,
-            isSynced = false,
-            isDeleted = false
+    override suspend fun updateTodo(id: String, description: String, isCompleted: Boolean) {
+        val existing = todoLocalDataSource.getTodoById(id) ?: return
+        todoLocalDataSource.insertTodo(
+            existing.copy(
+                description = description,
+                isCompleted = isCompleted,
+                updatedAt = System.currentTimeMillis(),
+                isSynced = false
+            )
         )
-        todoLocalDataSource.insertTodo(updatedLocalEntity)
-
-        return try {
-            val response = todoRemoteDataSource.updateTodo(id, description, isCompleted)
-            val todoDto = response.data.todo
-
-            todoLocalDataSource.insertTodo(todoDto.toEntityTodo(isSynced = true).copy(createdAt = originalCreatedAt))
-            Result.success(todoDto.toDomainTodo())
-        } catch (e: Exception) {
-            Result.success(updatedLocalEntity.toDomainTodo())
-        }
     }
 
-    override suspend fun deleteTodo(id: String): Result<Unit> {
+    override suspend fun deleteTodo(id: String) {
+        val existing = todoLocalDataSource.getTodoById(id) ?: return
+        todoLocalDataSource.insertTodo(
+            existing.copy(
+                isDeleted = true,
+                isSynced = false
+            )
+        )
+    }
+
+    override suspend fun syncTodos(): Result<Unit> {
         return try {
-            todoRemoteDataSource.deleteTodoById(id)
-            todoLocalDataSource.deleteTodoById(id)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            val localTodo = todoLocalDataSource.getTodoById(id)
-            if (localTodo != null) {
-                todoLocalDataSource.insertTodo(localTodo.copy(isDeleted = true, isSynced = false))
+            val locallyDeleted = todoLocalDataSource.getLocallyDeletedTodos()
+            locallyDeleted.forEach { localTodo ->
+                try {
+                    if (!localTodo.id.isLocal()) {
+                        todoRemoteDataSource.deleteTodoById(localTodo.id)
+                    }
+                    todoLocalDataSource.deleteTodoById(localTodo.id)
+                } catch (_: Exception) {}
             }
-            Result.success(Unit)
-        }
-    }
 
-    override suspend fun deleteAllTodos(): Result<Unit> {
-        return try {
-            todoRemoteDataSource.deleteAllTodos()
-            todoLocalDataSource.deleteAllTodos()
+            val unsyncedTodos = todoLocalDataSource.getAllTodos().first().filter { !it.isSynced }
+            unsyncedTodos.forEach { localTodo ->
+                try {
+                    if (localTodo.id.isLocal()) {
+                        val response = todoRemoteDataSource.createTodo(localTodo.description, localTodo.isCompleted)
+                        val serverTodo = response.data.todo
+                        todoLocalDataSource.deleteTodoById(localTodo.id)
+                        todoLocalDataSource.insertTodo(
+                            serverTodo.toEntityTodo(isSynced = true).copy(createdAt = localTodo.createdAt)
+                        )
+                    } else {
+                        val response = todoRemoteDataSource.updateTodo(localTodo.id, localTodo.description, localTodo.isCompleted)
+                        val serverTodo = response.data.todo
+                        todoLocalDataSource.insertTodo(
+                            serverTodo.toEntityTodo(isSynced = true).copy(createdAt = localTodo.createdAt)
+                        )
+                    }
+                } catch (_: Exception) {}
+            }
+
+            val remoteResponse = todoRemoteDataSource.getAllTodos()
+
+            val entitiesToInsert = remoteResponse.data.todos.mapNotNull { remoteTodo ->
+                val localExisting = todoLocalDataSource.getTodoById(remoteTodo.id)
+
+                if (localExisting != null && !localExisting.isSynced) {
+                    return@mapNotNull null
+                }
+
+                remoteTodo.toEntityTodo(isSynced = true).copy(
+                    createdAt = localExisting?.createdAt ?: System.currentTimeMillis()
+                )
+            }
+
+            todoLocalDataSource.insertTodos(entitiesToInsert)
             Result.success(Unit)
         } catch (e: Exception) {
-            todoLocalDataSource.deleteAllTodos()
-            Result.success(Unit)
+            Result.failure(e)
         }
     }
 }

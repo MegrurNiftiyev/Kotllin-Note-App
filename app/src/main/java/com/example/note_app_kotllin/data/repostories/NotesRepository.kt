@@ -65,8 +65,9 @@ class NotesRepository @Inject constructor(
 
             val response = noteRemoteDataSource.getAllNotes()
 
-            val entities = response.data.notes.map { remoteNote ->
+            val entities = response.data.notes.mapNotNull { remoteNote ->
                 val localExisting = noteLocalDataSource.getNoteById(remoteNote.id)
+                if (localExisting != null && !localExisting.isSynced) return@mapNotNull null
                 remoteNote.toEntityNote(isSynced = true).copy(
                     createdAt = localExisting?.createdAt ?: System.currentTimeMillis()
                 )

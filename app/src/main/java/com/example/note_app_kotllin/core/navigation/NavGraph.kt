@@ -1,20 +1,16 @@
 // core/navigation/NavGraph.kt
 package com.example.note_app_kotllin.core.navigation
 
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.note_app_kotllin.ui.screens.aichat.AiChatScreen
-import com.example.note_app_kotllin.ui.screens.aichat.AiChatViewModel
+import com.example.note_app_kotllin.ui.screens.ai_chat.AiChatScreen
 import com.example.note_app_kotllin.ui.screens.auth.login.LoginScreen
 import com.example.note_app_kotllin.ui.screens.auth.register.RegisterScreen
 import com.example.note_app_kotllin.ui.screens.home.HomeScreen

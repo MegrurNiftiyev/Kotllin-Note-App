@@ -28,6 +28,8 @@ class AuthRepository @Inject constructor(
         return try {
             val response = remoteDataSource.register(userName, email, password)
 
+            clearLocalData()
+
             encryptedCacheManager.saveSecureString(
                 CacheKeys.ACCESS_TOKEN, response.data.accessToken
             )
@@ -50,6 +52,9 @@ class AuthRepository @Inject constructor(
     ): Result<User> {
         return try {
             val response = remoteDataSource.login(email, password)
+
+            clearLocalData()
+
             encryptedCacheManager.saveSecureString(
                 CacheKeys.ACCESS_TOKEN, response.data.accessToken
             )
@@ -76,15 +81,21 @@ class AuthRepository @Inject constructor(
             )
             if (refreshToken == null) return Result.failure(AuthException.TokenNotFound())
             remoteDataSource.logout(refreshToken)
-            encryptedCacheManager.clearAllCache()
-            localDataSource.clearUser()
-            noteLocalDataSource.deleteAllNotes()
-            todoLocalDataSource.deleteAllTodos()
             Result.success(Unit)
         } catch (e: AuthException) {
             Result.failure(e)
         } catch (e: NetworkException) {
             Result.failure(e)
+        }finally{
+            clearLocalData()
         }
+    }
+
+
+    private suspend fun clearLocalData(){
+        encryptedCacheManager.clearAllCache()
+        localDataSource.clearUser()
+        noteLocalDataSource.deleteAllNotes()
+        todoLocalDataSource.deleteAllTodos()
     }
 }

@@ -115,7 +115,7 @@ fun TodoScreen(
                             onFocusGained = { viewModel.onFocusGained(todo.id, todo.description) },
                             onTextChange = { viewModel.onTextChange(it) },
                             onFocusLost = { viewModel.handleFocusLost(todo.id, it, todo.isCompleted) },
-                            onCheckedChange = { viewModel.updateTodoCompletion(todo.id, todo.description, it) },
+                            onCheckedChange = { viewModel.updateTodoCompletion(todo.id, it) },
                             onLongClick = { viewModel.deleteTodo(todo.id) })
                     }
                 }

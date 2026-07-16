@@ -3,12 +3,10 @@ package com.example.note_app_kotllin.ui.screens.todo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.note_app_kotllin.core.managers.AppNetworkManager
-import com.example.note_app_kotllin.data.repostories.TodoRepository
 import com.example.note_app_kotllin.domain.models.Todo
+import com.example.note_app_kotllin.domain.repositories.ITodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,17 +14,19 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val todoRepository: TodoRepository,
+    private val todoRepository: ITodoRepository,
     private val networkManager: AppNetworkManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TodoState())
     val state: StateFlow<TodoState> = _state.asStateFlow()
+
+    private val changedTodos = mutableMapOf<String, Todo>()
+    private val deletedTodos = mutableSetOf<String>()
 
     init {
         listenLocalTodos()
@@ -42,6 +42,7 @@ class TodoViewModel @Inject constructor(
                 .collect { syncTodos() }
         }
     }
+
     private fun listenLocalTodos() {
         viewModelScope.launch(IO) {
             todoRepository.getAllTodos().collect { todos ->
@@ -82,72 +83,93 @@ class TodoViewModel @Inject constructor(
     }
 
     fun handleFocusLost(id: String, finalText: String, isCompleted: Boolean) {
-        val currentTodo = _state.value.todos.find { it.id == id }
-
-        if (id.isNotEmpty() && currentTodo != null && currentTodo.description == finalText.trim()) {
-            _state.update { it.copy(focusedTodoId = null, focusedText = "") }
+        if (id.isEmpty()) {
+            val trimmed = finalText.trim()
+            _state.update { it.copy(draftTodo = null, focusedTodoId = null, focusedText = "") }
+            if (trimmed.isNotEmpty()) {
+                viewModelScope.launch(IO) { todoRepository.createTodo(trimmed, false) }
+            }
             return
         }
-        saveOrDeleteTodo(id, finalText, isCompleted)
+
+        val currentTodo = _state.value.todos.find { it.id == id }
+        val trimmed = finalText.trim()
+        val unchanged = currentTodo != null && currentTodo.description == trimmed
+
+        if (!unchanged) {
+            if (trimmed.isEmpty()) {
+                deleteTodo(id)
+            } else if (currentTodo != null) {
+                val updated = currentTodo.copy(description = trimmed, isCompleted = isCompleted)
+                changedTodos[id] = updated
+                _state.update { st -> st.copy(todos = st.todos.map { if (it.id == id) updated else it }) }
+
+                viewModelScope.launch(IO) {
+                    todoRepository.updateTodo(id, trimmed, isCompleted)
+                }
+            }
+        }
         _state.update { it.copy(focusedTodoId = null, focusedText = "") }
+    }
+
+    fun updateTodoCompletion(id: String, isCompleted: Boolean) {
+        val currentTodo = _state.value.todos.find { it.id == id } ?: return
+        val updated = currentTodo.copy(isCompleted = isCompleted)
+
+        changedTodos[id] = updated
+        _state.update { st -> st.copy(todos = st.todos.map { if (it.id == id) updated else it }) }
+
+        viewModelScope.launch(IO) {
+            todoRepository.updateTodo(id, updated.description, isCompleted)
+        }
+    }
+
+    fun deleteTodo(id: String) {
+        changedTodos.remove(id)
+        deletedTodos.add(id)
+
+        if (_state.value.focusedTodoId == id) {
+            _state.update { it.copy(focusedTodoId = null, focusedText = "") }
+        }
+        _state.update { it.copy(todos = it.todos.filterNot { t -> t.id == id }) }
+
+        viewModelScope.launch(IO) {
+            todoRepository.deleteTodo(id)
+        }
     }
 
     fun handleScreenExit() {
         val current = _state.value
-        val id = current.focusedTodoId ?: return
-        val currentTodo = current.todos.find { it.id == id }
-        val isCompleted = current.todos.find { it.id == id }?.isCompleted ?: false
+        val focusedId = current.focusedTodoId
 
-        if (id.isNotEmpty() && currentTodo != null && currentTodo.description == current.focusedText.trim()) {
-            _state.update { it.copy(focusedTodoId = null, focusedText = "") }
-            return
+        if (focusedId == "") {
+            val trimmed = current.focusedText.trim()
+            _state.update { it.copy(draftTodo = null, focusedTodoId = null, focusedText = "") }
+            if (trimmed.isNotEmpty()) {
+                viewModelScope.launch(IO) { todoRepository.createTodo(trimmed, false) }
+            }
+        } else if (!focusedId.isNullOrEmpty()) {
+            handleFocusLost(
+                id = focusedId,
+                finalText = current.focusedText,
+                isCompleted = current.todos.find { it.id == focusedId }?.isCompleted ?: false
+            )
         }
 
-        saveOrDeleteTodo(id, current.focusedText, isCompleted)
-        _state.update { it.copy(focusedTodoId = null, focusedText = "") }
-    }
-
-    private fun saveOrDeleteTodo(id: String, text: String, isCompleted: Boolean) {
-        val trimmed = text.trim()
-
-        if (id.isEmpty()) {
-            if (trimmed.isEmpty()) {
-                _state.update { it.copy(draftTodo = null) }
-            } else {
-                viewModelScope.launch {
-                    withContext(NonCancellable) {
-                        todoRepository.createTodo(description = trimmed, isCompleted = false)
-                    }
-                }
-                _state.update { it.copy(draftTodo = null) }
-            }
-        } else {
-            if (trimmed.isEmpty()) {
-                viewModelScope.launch {
-                    withContext(NonCancellable) { todoRepository.deleteTodo(id) }
-                }
-            } else {
-                viewModelScope.launch {
-                    withContext(NonCancellable) { todoRepository.updateTodo(id, trimmed, isCompleted) }
-                }
+        val deletions = deletedTodos.toSet()
+        deletedTodos.clear()
+        deletions.forEach { id ->
+            viewModelScope.launch(IO) {
+                todoRepository.deleteTodo(id)
             }
         }
-    }
 
-    private val updateJobs = mutableMapOf<String, Job>()
-
-    fun updateTodoCompletion(id: String, description: String, isCompleted: Boolean) {
-        updateJobs[id]?.cancel()
-        updateJobs[id] = viewModelScope.launch {
-            todoRepository.updateTodo(id, description, isCompleted)
-        }
-    }
-    fun deleteTodo(id: String) {
-        if (_state.value.focusedTodoId == id) {
-            _state.update { it.copy(focusedTodoId = null, focusedText = "") }
-        }
-        viewModelScope.launch {
-            withContext(NonCancellable) { todoRepository.deleteTodo(id) }
+        val changes = changedTodos.toMap()
+        changedTodos.clear()
+        changes.forEach { (id, todo) ->
+            viewModelScope.launch(IO) {
+                todoRepository.updateTodo(id, todo.description, todo.isCompleted)
+            }
         }
     }
 }

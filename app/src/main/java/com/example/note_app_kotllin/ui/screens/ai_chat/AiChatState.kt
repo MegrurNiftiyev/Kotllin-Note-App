@@ -1,4 +1,4 @@
-package com.example.note_app_kotllin.ui.screens.aichat
+package com.example.note_app_kotllin.ui.screens.ai_chat
 
 import com.example.note_app_kotllin.domain.models.Message
 

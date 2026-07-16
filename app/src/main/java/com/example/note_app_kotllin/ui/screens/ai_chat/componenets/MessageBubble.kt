@@ -1,4 +1,4 @@
-package com.example.note_app_kotllin.ui.screens.aichat.componenets
+package com.example.note_app_kotllin.ui.screens.ai_chat.componenets
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

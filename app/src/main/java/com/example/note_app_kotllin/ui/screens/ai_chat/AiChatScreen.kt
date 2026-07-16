@@ -1,4 +1,4 @@
-package com.example.note_app_kotllin.ui.screens.aichat
+package com.example.note_app_kotllin.ui.screens.ai_chat
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -35,9 +35,9 @@ import com.example.note_app_kotllin.core.constants.Paddings
 import com.example.note_app_kotllin.core.navigation.AiChat
 import com.example.note_app_kotllin.core.navigation.Home
 import com.example.note_app_kotllin.ui.components.EmptyStateBox
-import com.example.note_app_kotllin.ui.screens.aichat.componenets.AiChatInputBar
-import com.example.note_app_kotllin.ui.screens.aichat.componenets.AiTypingBubble
-import com.example.note_app_kotllin.ui.screens.aichat.componenets.MessageBubble
+import com.example.note_app_kotllin.ui.screens.ai_chat.componenets.AiChatInputBar
+import com.example.note_app_kotllin.ui.screens.ai_chat.componenets.AiTypingBubble
+import com.example.note_app_kotllin.ui.screens.ai_chat.componenets.MessageBubble
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,13 +48,18 @@ fun AiChatScreen(
     val listState = rememberLazyListState()
 
     val onBackNavigate = {
-        navController.navigate(Home) {
-            popUpTo(AiChat) {
-                saveState = true
-                inclusive = true
+        val previousRoute = navController.previousBackStackEntry?.destination?.route
+        if (previousRoute != null) {
+            navController.navigate(previousRoute) {
+                popUpTo(AiChat) {
+                    saveState = true
+                    inclusive = true
+                }
+                launchSingleTop = true
+                restoreState = true
             }
-            launchSingleTop = true
-            restoreState = true
+        } else {
+            navController.popBackStack()
         }
     }
 
