@@ -1,4 +1,4 @@
-package com.example.note_app_kotllin.ui.screens.notedetail
+package com.example.note_app_kotllin.ui.screens.note_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

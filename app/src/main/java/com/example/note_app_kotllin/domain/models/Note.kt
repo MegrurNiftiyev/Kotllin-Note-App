@@ -4,8 +4,8 @@ data class Note(
     val id: String,
     val title: String,
     val content: String,
-    val createdAt: Long,
-    val updatedAt: Long,
-    val isSynced: Boolean
+    val createdAt: Long=System.currentTimeMillis(),
+    val updatedAt: Long=System.currentTimeMillis(),
+    val isSynced: Boolean=false
 
 )

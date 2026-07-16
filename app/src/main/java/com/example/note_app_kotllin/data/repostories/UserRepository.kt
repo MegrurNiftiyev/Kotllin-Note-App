@@ -17,7 +17,7 @@ class UserRepository @Inject constructor(
         return userLocalDataSource.getUser()?.toDomainUser()
     }
 
-    override suspend fun synUser(): Result<Unit> {
+    override suspend fun syncUser(): Result<Unit> {
         return try {
             val response = userRemoteDataSource.getUser()
             val userRemote = response.data.toEntityUser()

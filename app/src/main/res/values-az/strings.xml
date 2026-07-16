@@ -38,8 +38,23 @@
     <string name="error_empty_confirm_password">Şifrəni təkrar daxil edin</string>
     <string name="error_passwords_not_match">Şifrələr uyğun gəlmir</string>
 
+    <!-- ===== AI Chat ===== -->
+    <string name="ai_chat_title">Süni İntellekt Çat</string>
+    <string name="ai_chat_placeholder">Mesaj yaz...</string>
+    <string name="ai_chat_stop">Dayandır</string>
+    <string name="ai_chat_send">Göndər</string>
+    <string name="empty_ai_state">Süni intellektə ilk mesajınızı göndərin</string>
+    <string name="ai_chat_typing">Yazır</string>
+
+    <!-- ===== AI Chat Errors ===== -->
+    <string name="error_ai_validation">Süni intellekt doğrulama xətası. Zəhmət olmasa sorğunu yoxlayın.</string>
+    <string name="error_ai_unauthorized">Süni intellekt xidmətinə icazə verilmədi. API açarını yoxlayın.</string>
+    <string name="error_ai_rate_limited">Süni intellekt limitinə çatıldı. Bir az sonra yenidən cəhd edin.</string>
+    <string name="error_ai_server_error">Süni intellekt server xətası. Bir az sonra yenidən cəhd edin.</string>
+    <string name="error_ai_empty_response">Süni intellekt boş cavab qaytardı.</string>
+
     <!-- ===== Notes ===== -->
-    <string name="empty_state">Hələlik heç bir şey yoxdur. Əlavə etmək üçün + düyməsinə basın.</string>
+    <string name="empty_state">Hələlik heç bir şey yoxdur. Əlavə Edin.</string>
 
 
     <!-- ===== Note Detail ===== -->
@@ -52,7 +67,7 @@
     <string name="settings_title">Tənzimləmələr</string>
     <string name="settings_language">Dil</string>
     <string name="settings_dark_mode">Tünd Rejim</string>
-    <string name="settings_logout">Çıkış et</string>
+    <string name="settings_logout">Çıxış et</string>
 
 
     <!-- ===== Language Sheet ===== -->

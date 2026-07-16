@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface IUserRepository {
     suspend fun getUser(): User?
-    suspend fun  synUser(): Result<Unit>
-
+    suspend fun  syncUser(): Result<Unit>
 
 }

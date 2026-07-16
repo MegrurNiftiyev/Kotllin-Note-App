@@ -27,7 +27,7 @@ class RegisterViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     fun register(userName: String, email: String, password: String, confirmPassword: String) {
-        if (!validate(userName, email, password, confirmPassword)) return
+        if (!validate(userName, email, password, confirmPassword) || _state.value.isSuccess||_state.value.isLoading) return
 
         viewModelScope.launch(IO) {
             _state.update { it.copy(isLoading = true, errorMessage = null) }

@@ -37,8 +37,23 @@
     <string name="error_empty_confirm_password">Please re-enter your password</string>
     <string name="error_passwords_not_match">Passwords do not match</string>
 
+    <!-- ===== AI Chat ===== -->
+    <string name="ai_chat_title">AI Chat</string>
+    <string name="ai_chat_placeholder">Type a message...</string>
+    <string name="ai_chat_stop">Stop</string>
+    <string name="ai_chat_send">Send</string>
+    <string name="empty_ai_state">Send your first message to AI</string>
+    <string name="ai_chat_typing">Typing</string>
+
+    <!-- ===== AI Chat Errors ===== -->
+    <string name="error_ai_validation">AI validation error. Please check your request.</string>
+    <string name="error_ai_unauthorized">AI service unauthorized. Check your API key.</string>
+    <string name="error_ai_rate_limited">AI rate limit reached. Please try again later.</string>
+    <string name="error_ai_server_error">AI server error. Please try again later.</string>
+    <string name="error_ai_empty_response">AI returned an empty response.</string>
+
     <!-- ===== Notes ===== -->
-    <string name="empty_state">No elements yet. Click the + button to add one.</string>
+    <string name="empty_state">No elements yet. Add First element.</string>
 
     <!-- ===== Note Detail ===== -->
     <string name="cd_delete">Delete note</string>

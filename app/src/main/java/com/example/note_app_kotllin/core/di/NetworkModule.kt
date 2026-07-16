@@ -3,9 +3,11 @@ package com.example.note_app_kotllin.core.di
 import com.example.note_app_kotllin.BuildConfig
 import com.example.note_app_kotllin.core.constants.ApiUrls
 import com.example.note_app_kotllin.core.interceptors.AuthInterceptor
+import com.example.note_app_kotllin.core.interceptors.OpenAiInterceptor
 import com.example.note_app_kotllin.core.interceptors.TokenAuthenticator
 import com.example.note_app_kotllin.data.datasoruces.remote.services.AuthApiService
 import com.example.note_app_kotllin.data.datasoruces.remote.services.NoteApiService
+import com.example.note_app_kotllin.data.datasoruces.remote.services.OpenAiApiService
 import com.example.note_app_kotllin.data.datasoruces.remote.services.TodoApiService
 import com.example.note_app_kotllin.data.datasoruces.remote.services.UserApiService
 import dagger.Module
@@ -35,7 +37,6 @@ object NetworkModule {
         return OkHttpClient.Builder().build()
     }
 
-
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
@@ -55,7 +56,6 @@ object NetworkModule {
         authInterceptor: AuthInterceptor,
         tokenAuthenticator: TokenAuthenticator,
         loggingInterceptor: HttpLoggingInterceptor
-
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
@@ -66,12 +66,28 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("OpenAiOkHttpClient")
+    fun provideOpenAiOkHttpClient(
+        openAiInterceptor: OpenAiInterceptor,
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(openAiInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
     @Named("AuthRetrofit")
     fun provideAuthRetrofit(
         @Named("AuthOkHttpClient") okHttpClient: OkHttpClient
     ): Retrofit {
-        return Retrofit.Builder().baseUrl(ApiUrls.BASE_URL).client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory(contentType)).build()
+        return Retrofit.Builder()
+            .baseUrl(ApiUrls.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
     }
 
     @Provides
@@ -80,8 +96,24 @@ object NetworkModule {
     fun provideAppRetrofit(
         @Named("NormalOkHttpClient") okHttpClient: OkHttpClient
     ): Retrofit {
-        return Retrofit.Builder().baseUrl(ApiUrls.BASE_URL).client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory(contentType)).build()
+        return Retrofit.Builder()
+            .baseUrl(ApiUrls.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("OpenAiRetrofit")
+    fun provideOpenAiRetrofit(
+        @Named("OpenAiOkHttpClient") okHttpClient: OkHttpClient
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(ApiUrls.OPENAI_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
     }
 
     @Provides
@@ -104,7 +136,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideNTodoApiService(@Named("AppRetrofit") retrofit: Retrofit): TodoApiService {
+    fun provideTodoApiService(@Named("AppRetrofit") retrofit: Retrofit): TodoApiService {
         return retrofit.create(TodoApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOpenAiApiService(@Named("OpenAiRetrofit") retrofit: Retrofit): OpenAiApiService {
+        return retrofit.create(OpenAiApiService::class.java)
     }
 }

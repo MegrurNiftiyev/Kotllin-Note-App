@@ -27,7 +27,7 @@ class LoginViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     fun login(email: String, password: String) {
-        if (!validate(email, password)) return
+        if (!validate(email, password)|| _state.value.isSuccess || _state.value.isLoading) return
         viewModelScope.launch(IO) {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             authRepository.login(email, password).onSuccess {

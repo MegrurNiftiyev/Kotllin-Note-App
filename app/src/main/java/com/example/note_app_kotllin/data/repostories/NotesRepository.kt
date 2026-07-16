@@ -52,11 +52,11 @@ class NotesRepository @Inject constructor(
                         val response = noteRemoteDataSource.createNote(localNote.title, localNote.content)
                         val serverNote = response.data.note
                         noteLocalDataSource.deleteNoteById(localNote.id)
-                        noteLocalDataSource.insertNote(serverNote.toEntityNote(isSynced = true))
+                        noteLocalDataSource.insertNote(serverNote.toEntityNote(isSynced = true).copy(createdAt = localNote.createdAt))
                     } else {
                         val response = noteRemoteDataSource.updateNote(localNote.id, localNote.title, localNote.content)
                         val serverNote = response.data.note
-                        noteLocalDataSource.insertNote(serverNote.toEntityNote(isSynced = true))
+                        noteLocalDataSource.insertNote(serverNote.toEntityNote(isSynced = true).copy(createdAt = localNote.createdAt))
                     }
                 } catch (e: Exception) {
 
@@ -64,7 +64,13 @@ class NotesRepository @Inject constructor(
             }
 
             val response = noteRemoteDataSource.getAllNotes()
-            val entities = response.data.notes.map { it.toEntityNote(isSynced = true) }
+
+            val entities = response.data.notes.map { remoteNote ->
+                val localExisting = noteLocalDataSource.getNoteById(remoteNote.id)
+                remoteNote.toEntityNote(isSynced = true).copy(
+                    createdAt = localExisting?.createdAt ?: System.currentTimeMillis()
+                )
+            }
             noteLocalDataSource.insertNotes(entities)
 
             Result.success(Unit)
@@ -77,7 +83,13 @@ class NotesRepository @Inject constructor(
         return try {
             val response = noteRemoteDataSource.getNoteById(id)
             val noteDto = response.data.note
-            noteLocalDataSource.insertNote(noteDto.toEntityNote(isSynced = true))
+            val localExisting = noteLocalDataSource.getNoteById(id)
+
+            noteLocalDataSource.insertNote(
+                noteDto.toEntityNote(isSynced = true).copy(
+                    createdAt = localExisting?.createdAt ?: System.currentTimeMillis()
+                )
+            )
             Result.success(noteDto.toDomainNote())
         } catch (e: Exception) {
             val localNote = noteLocalDataSource.getNoteById(id)
@@ -109,7 +121,7 @@ class NotesRepository @Inject constructor(
             val noteDto = response.data.note
 
             noteLocalDataSource.deleteNoteById(localId)
-            noteLocalDataSource.insertNote(noteDto.toEntityNote(isSynced = true))
+            noteLocalDataSource.insertNote(noteDto.toEntityNote(isSynced = true).copy(createdAt = currentTime))
 
             Result.success(noteDto.toDomainNote())
         } catch (e: Exception) {
@@ -120,11 +132,14 @@ class NotesRepository @Inject constructor(
     override suspend fun updateNote(id: String, title: String, content: String): Result<Note> {
         val currentTime = System.currentTimeMillis()
 
+        val existingNote = noteLocalDataSource.getNoteById(id)
+        val originalCreatedAt = existingNote?.createdAt ?: currentTime
+
         val updatedLocalEntity = NoteEntity(
             id = id,
             title = title,
             content = content,
-            createdAt = currentTime,
+            createdAt = originalCreatedAt,
             updatedAt = currentTime,
             isSynced = false,
             isDeleted = false
@@ -135,7 +150,7 @@ class NotesRepository @Inject constructor(
             val response = noteRemoteDataSource.updateNote(id, title, content)
             val noteDto = response.data.note
 
-            noteLocalDataSource.insertNote(noteDto.toEntityNote(isSynced = true))
+            noteLocalDataSource.insertNote(noteDto.toEntityNote(isSynced = true).copy(createdAt = originalCreatedAt))
             Result.success(noteDto.toDomainNote())
         } catch (e: Exception) {
             Result.success(updatedLocalEntity.toDomainNote())

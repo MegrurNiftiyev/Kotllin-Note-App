@@ -67,7 +67,7 @@ class SettingsViewModel @Inject constructor(
 
     fun syncUser() {
         viewModelScope.launch(IO) {
-            userRepository.synUser().onSuccess { getUser() }
+            userRepository.syncUser().onSuccess { getUser() }
         }
     }
 }

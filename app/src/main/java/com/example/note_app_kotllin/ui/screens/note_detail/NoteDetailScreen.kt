@@ -1,10 +1,11 @@
-package com.example.note_app_kotllin.ui.screens.notedetail
+package com.example.note_app_kotllin.ui.screens.note_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,7 +13,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,12 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.note_app_kotllin.R
+import com.example.note_app_kotllin.core.constants.IconSizes
 import com.example.note_app_kotllin.core.constants.Paddings
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,16 +84,19 @@ fun NoteDetailScreen(
             TopAppBar(title = { Text(" ") }, navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.cd_back)
+                        painter = painterResource(R.drawable.lower_than),
+                        contentDescription = stringResource(id = R.string.cd_back),
+                        modifier = Modifier.size(IconSizes.LargePlus)
                     )
                 }
             }, actions = {
                 Icon(
-                    imageVector = if (isSynced) Icons.Filled.Check else Icons.Filled.Close,
+                    painter =  if (isSynced) painterResource(R.drawable.cloud_done) else painterResource(R.drawable.cloud_cross),
                     contentDescription = null,
-                    tint = if (state.isSynced) MaterialTheme.colorScheme.primary else Color.Gray,
-                    modifier = Modifier.padding(horizontal = Paddings.ExtraSmall)
+                    tint = if (isSynced) MaterialTheme.colorScheme.primary else Color.Red,
+                    modifier = Modifier
+                        .padding(horizontal = Paddings.ExtraSmall)
+                        .size(IconSizes.LargePlus)
                 )
                 IconButton(
                     onClick = {
@@ -99,16 +104,12 @@ fun NoteDetailScreen(
                         navController.popBackStack()
                     }) {
                     Icon(
-                        Icons.Default.Delete,
-                        contentDescription = stringResource(id = R.string.cd_delete)
+                        painterResource(R.drawable.trash),
+                        contentDescription = stringResource(id = R.string.cd_delete),
+                        modifier = Modifier.size(IconSizes.LargePlus)
                     )
                 }
-                IconButton(onClick = { }) {
-                    Icon(
-                        Icons.Default.Share,
-                        contentDescription = stringResource(id = R.string.cd_share)
-                    )
-                }
+
             })
         }) { innerPadding ->
         Column(

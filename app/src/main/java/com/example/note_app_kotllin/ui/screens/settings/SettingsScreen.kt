@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.note_app_kotllin.R
 import com.example.note_app_kotllin.core.constants.ApiUrls
+import com.example.note_app_kotllin.core.constants.IconSizes
 import com.example.note_app_kotllin.core.constants.Paddings
 import com.example.note_app_kotllin.core.constants.Spaces
 import com.example.note_app_kotllin.core.extensions.getCurrentLanguage
@@ -68,8 +70,9 @@ fun SettingsScreen(
             TopAppBar(title = { Text(stringResource(R.string.settings_title)) }, navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back)
+                        painterResource(R.drawable.lower_than),
+                        contentDescription = stringResource(R.string.cd_back),
+                        modifier = Modifier.size(IconSizes.LargePlus)
                     )
                 }
             })
@@ -125,7 +128,7 @@ fun SettingsScreen(
                 onClick = {
                     viewModel.logout()
                     navController.navigate(Register) {
-                        popUpTo(0) {
+                        popUpTo(navController.graph.id) {
                             inclusive = true
                         }
                     }
@@ -138,8 +141,9 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.width(Spaces.Medium))
                     Icon(
-                        Icons.AutoMirrored.Outlined.ExitToApp,
+                        painterResource(R.drawable.logout),
                         contentDescription = stringResource(R.string.settings_logout),
+                        modifier = Modifier.size(IconSizes.LargePlus)
                     )
                 })
             if (state.isLanguageSheetOpen) {
