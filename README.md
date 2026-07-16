@@ -152,24 +152,17 @@ The assistant is intentionally scoped: it only acts on note/todo data it was act
 
 <p align="center">
   <img src="screenshots/chat-1-typing.jpg" width="220" alt="AI typing indicator"/>
-</p>
-<p align="center">
   <img src="screenshots/chat-1.jpg" width="220" alt="AI chat 1"/>
-</p>
-<p align="center">
   <img src="screenshots/chat-2.jpg" width="220" alt="AI chat 2"/>
 </p>
 <p align="center">
   <img src="screenshots/chat-3.jpg" width="220" alt="AI chat 3"/>
-</p>
-<p align="center">
   <img src="screenshots/chat-4.jpg" width="220" alt="AI chat 4"/>
-</p>
-<p align="center">
   <img src="screenshots/chat-6.jpg" width="220" alt="AI chat 6"/>
 </p>
 <p align="center">
   <img src="screenshots/chat-7.jpg" width="220" alt="AI chat 7"/>
+  <img src="screenshots/chat-8.jpg" width="220" alt="AI chat 8"/>
 </p>
 
 ## Notes & Todos — Offline Mode
@@ -181,26 +174,17 @@ Notes and todos are offline-first: every read comes straight from Room, and ever
 - **`AppNetworkManager`** wraps `ConnectivityManager.NetworkCallback` into a single `isConnected: StateFlow<Boolean>`.
 - **`NotesViewModel`/`TodoViewModel`** collect `isConnected`, and every time it flips to `true`, they call `syncNotes()`/`syncTodos()` in the background — no manual "sync" button needed.
 - **What sync actually does**, per repository:
-    1. Push locally-deleted items first: if the id `isLocal()` (never reached the server), just drop it locally; otherwise call the remote delete, then drop it locally.
-    2. Push every remaining unsynced item (`isSynced == false`): local-id items get created remotely and re-inserted with the server's real id; existing items get updated remotely.
-    3. Pull the full remote list and reconcile it into Room (`isSynced = true`), keeping each item's original local `createdAt` so ordering doesn't jump around after a sync.
+  1. Push locally-deleted items first: if the id `isLocal()` (never reached the server), just drop it locally; otherwise call the remote delete, then drop it locally.
+  2. Push every remaining unsynced item (`isSynced == false`): local-id items get created remotely and re-inserted with the server's real id; existing items get updated remotely.
+  3. Pull the full remote list and reconcile it into Room (`isSynced = true`), keeping each item's original local `createdAt` so ordering doesn't jump around after a sync.
 - All of this happens quietly in the background thread the ViewModel's `viewModelScope` runs on — the UI just keeps reading from the same local Room `Flow` throughout.
 
-| | Login | Register | Notes | Todo | Settings |
-|---|---|---|---|---|---|
-| **Light** | <img src="screenshots/login-light.jpg" width="140"/> | <img src="screenshots/register-lite.jpg" width="140"/> | <img src="screenshots/notes-simple.jpg" width="140"/> | <img src="screenshots/todo-light.jpg" width="140"/> | <img src="screenshots/help-settings-light.jpg" width="140"/> |
-| **Dark** | <img src="screenshots/login-dark%20.jpg" width="140"/> | <img src="screenshots/register-dark.jpg" width="140"/> | <img src="screenshots/notes-simple-dark.jpg" width="140"/> | <img src="screenshots/todo-dark.jpg" width="140"/> | <img src="screenshots/help-settings-dark.jpg" width="140"/> |
+First row is light theme, second row is dark theme:
 
-*(the "Settings" column above uses the Help & Settings screen, since it's the one with both a light and dark shot)*
-
-A few more screens that only exist in one theme:
-
-<p align="center">
-  <img src="screenshots/note-detail-light.jpg" width="150" alt="Note detail"/>
-  <img src="screenshots/settings-dark.jpg" width="150" alt="Settings"/>
-  <img src="screenshots/devices-settings-dark.jpg" width="150" alt="Devices settings"/>
-  <img src="screenshots/settings-language-bottomshet.jpg" width="150" alt="Language bottom sheet"/>
-</p>
+| Login | Register | Notes | Todo | Note Detail | Settings | Language |
+|---|---|---|---|---|---|---|
+| <img src="screenshots/login-light.jpg" width="110"/> | <img src="screenshots/register-lite.jpg" width="110"/> | <img src="screenshots/notes-simple.jpg" width="110"/> | <img src="screenshots/todo-light.jpg" width="110"/> | <img src="screenshots/note-detail-light.jpg" width="110"/> | <img src="screenshots/settings-light.jpeg" width="110"/> | <img src="screenshots/settings-language-bottomshet-light.jpg" width="110"/> |
+| <img src="screenshots/login-dark%20.jpg" width="110"/> | <img src="screenshots/register-dark.jpg" width="110"/> | <img src="screenshots/notes-simple-dark.jpg" width="110"/> | <img src="screenshots/todo-dark.jpg" width="110"/> | <img src="screenshots/note-deatil-dark.jpg" width="110"/> | <img src="screenshots/settings-dark.jpg" width="110"/> | <img src="screenshots/settings-language-bottomshet-dark.jpeg" width="110"/> |
 
 ## Setup
 
