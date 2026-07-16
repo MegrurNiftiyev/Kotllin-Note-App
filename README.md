@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="app\src\main\ic_launcher-playstore.png" width="110" alt="Note App Logo"/>
+</p>
+
+
 <h1 align="center">Note App</h1>
 
 <p align="center">
